@@ -1,4 +1,4 @@
-"use client";
+import "server-only";
 
 import * as React from "react";
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";

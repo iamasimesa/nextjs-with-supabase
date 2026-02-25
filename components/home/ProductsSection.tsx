@@ -1,4 +1,4 @@
-"use client";
+import "server-only";
 
 import { useEffect, useState } from "react";
 import ProductGrid from "@/components/home/ProductGrid";

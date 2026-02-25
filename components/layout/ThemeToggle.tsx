@@ -1,4 +1,4 @@
-"use client"
+import "server-only"
 
 import { useTheme } from "next-themes"
 import { useEffect, useState } from "react"

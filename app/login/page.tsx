@@ -1,4 +1,4 @@
-"use client";
+import "server-only";
 
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";

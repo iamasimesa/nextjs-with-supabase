@@ -1,4 +1,4 @@
-"use client";
+import "server-only";
 
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";

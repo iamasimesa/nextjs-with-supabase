@@ -1,4 +1,4 @@
-"use client";
+import "server-only";
 
 export default function Error({ error }: { error: Error }) {
   return (

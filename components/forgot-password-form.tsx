@@ -1,4 +1,4 @@
-"use client";
+import "server-only";
 
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
