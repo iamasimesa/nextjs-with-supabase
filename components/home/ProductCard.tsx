@@ -1,29 +1,37 @@
-import Link from "next/link";
+import Link from "next/link"
+import Image from "next/image"
 
-export default function ProductCard({ p }: { p: any }) {
+type Product = {
+  id: string
+  slug: string
+  title: string
+  price: string | number
+  image_url: string | null
+}
+
+export default function ProductCard({ product }: { product: Product }) {
   return (
-    <div className="group rounded-2xl border bg-card p-4 transition hover:shadow-sm">
-      <Link href={`/product/${p.slug}`} className="block">
-        <div className="aspect-[4/3] w-full rounded-xl bg-muted" />
-        <div className="mt-3 flex items-start justify-between gap-3">
+    <div className="group overflow-hidden rounded-lg border border-border transition hover:shadow-sm">
+      <Link href={`/product/${product.slug}`} className="block">
+        <div className="relative aspect-square w-full">
+          <Image
+            src={product.image_url ?? "/placeholder.png"}
+            alt={product.title}
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 50vw, 25vw"
+          />
+        </div>
+
+        <div className="p-3">
           <h3 className="line-clamp-2 text-sm font-medium group-hover:underline">
-            {p.title}
+            {product.title}
           </h3>
+          <div className="mt-2 text-sm text-muted-foreground">
+            ${product.price}
+          </div>
         </div>
       </Link>
-
-      <div className="mt-2 text-sm text-muted-foreground">
-        {p.price} {p.currency}
-      </div>
-
-      <div className="mt-4">
-        <Link
-          href={`/product/${p.slug}`}
-          className="inline-flex w-full items-center justify-center rounded-xl border px-3 py-2 text-sm font-medium hover:bg-muted"
-        >
-          View
-        </Link>
-      </div>
     </div>
-  );
+  )
 }
