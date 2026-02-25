@@ -1,4 +1,4 @@
-import "server-only";
+"use client";
 
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import { useState } from "react";

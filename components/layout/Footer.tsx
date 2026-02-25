@@ -1,4 +1,4 @@
-import "server-only"
+"use client"
 
 import Container from "@/components/layout/Container"
 import { useEffect, useState } from "react"
