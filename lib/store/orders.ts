@@ -1,14 +1,78 @@
-import { getGqlClient } from "@/lib/gql/client";
-import { MY_ORDERS, ORDER_BY_ID } from "@/lib/gql/queries/orders";
+export async function getOrderById(token: string, id: string) {
+  const headers = {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
+    apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  };
 
-export async function getMyOrders(accessToken: string) {
-  const client = getGqlClient(accessToken);
-  const data: any = await client.request(MY_ORDERS);
-  return data.ordersCollection?.edges?.map((e: any) => e.node) ?? [];
-}
+  // 1️⃣ Order header only
+  const orderRes = await fetch(
+    process.env.NEXT_PUBLIC_SUPABASE_GRAPHQL_URL!,
+    {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        query: `
+          query OrderById($id: UUID!) {
+            ordersCollection(filter: { id: { eq: $id } }, first: 1) {
+              edges {
+                node {
+                  id
+                  status
+                  total_amount
+                  currency
+                  created_at
+                }
+              }
+            }
+          }
+        `,
+        variables: { id },
+      }),
+    }
+  );
 
-export async function getOrderById(accessToken: string, id: string) {
-  const client = getGqlClient(accessToken);
-  const data: any = await client.request(ORDER_BY_ID, { id });
-  return data.ordersCollection?.edges?.[0]?.node ?? null;
+  const orderJson = await orderRes.json();
+  const order =
+    orderJson?.data?.ordersCollection?.edges?.[0]?.node ?? null;
+
+  if (!order) return null;
+
+  // 2️⃣ Fetch order items separately
+  const itemsRes = await fetch(
+    process.env.NEXT_PUBLIC_SUPABASE_GRAPHQL_URL!,
+    {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        query: `
+          query OrderItems($orderId: UUID!) {
+            order_itemsCollection(filter: { order_id: { eq: $orderId } }) {
+              edges {
+                node {
+                  id
+                  title
+                  unit_price
+                  quantity
+                }
+              }
+            }
+          }
+        `,
+        variables: { orderId: id },
+      }),
+    }
+  );
+
+  const itemsJson = await itemsRes.json();
+  const items =
+    itemsJson?.data?.order_itemsCollection?.edges ?? [];
+
+  // Merge manually
+  return {
+    ...order,
+    order_itemsCollection: {
+      edges: items,
+    },
+  };
 }
