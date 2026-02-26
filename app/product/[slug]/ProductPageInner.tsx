@@ -33,7 +33,7 @@ export default async function ProductPageInner({
         <p className="mt-2 text-muted-foreground">{product.description}</p>
 
         <div className="mt-4 text-lg font-bold">
-          {product.price} {product.currency}
+         {product.currency} {product.price} 
         </div>
 
         <div className="mt-4">

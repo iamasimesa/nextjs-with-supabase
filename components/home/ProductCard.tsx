@@ -28,7 +28,7 @@ export default function ProductCard({ product }: { product: Product }) {
             {product.title}
           </h3>
           <div className="mt-2 text-sm text-muted-foreground">
-            ${product.price}
+            AED {product.price}
           </div>
         </div>
       </Link>
