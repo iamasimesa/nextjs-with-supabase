@@ -1,47 +1,54 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
-import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
-import { getOrderById } from "@/lib/store/orders";
-import Link from "next/link";
+import { useEffect, useState } from "react"
+import { useParams } from "next/navigation"
+import { createSupabaseBrowserClient } from "@/lib/supabase/browser"
+import { getOrderById } from "@/lib/store/orders"
+import Link from "next/link"
 
-export default function OrderDetailPage({ params }: { params: { id: string } }) {
-  const [loading, setLoading] = useState(true);
-  const [order, setOrder] = useState<any>(null);
-  const [error, setError] = useState("");
+export default function OrderDetailPage() {
+  const params = useParams<{ id: string }>()
+  const id = params?.id
 
-  const load = async () => {
-    setLoading(true);
-    setError("");
-
-    const supabase = createSupabaseBrowserClient();
-    const { data: sessionData } = await supabase.auth.getSession();
-    const token = sessionData.session?.access_token;
-
-    if (!token) {
-      window.location.href = `/login?next=${encodeURIComponent(`/account/orders/${params.id}`)}`;
-      return;
-    }
-
-    try {
-      const o = await getOrderById(token, params.id);
-      setOrder(o);
-    } catch (e: any) {
-      setError(e.message ?? "Failed to load order");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [loading, setLoading] = useState(true)
+  const [order, setOrder] = useState<any>(null)
+  const [error, setError] = useState("")
 
   useEffect(() => {
-    load();
-  }, []);
+    if (!id) return
 
-  if (loading) return <main style={{ padding: 24 }}>Loading order...</main>;
-  if (error) return <main style={{ padding: 24 }}>Error: {error}</main>;
-  if (!order) return <main style={{ padding: 24 }}>Order not found.</main>;
+    const load = async () => {
+      setLoading(true)
+      setError("")
 
-  const items = order.order_itemsCollection?.edges?.map((e: any) => e.node) ?? [];
+      const supabase = createSupabaseBrowserClient()
+      const { data: sessionData } = await supabase.auth.getSession()
+      const token = sessionData.session?.access_token
+
+      if (!token) {
+        window.location.href = `/login?next=${encodeURIComponent(`/account/orders/${id}`)}`
+        return
+      }
+
+      try {
+        const o = await getOrderById(token, id)
+        setOrder(o)
+      } catch (e: any) {
+        setError(e.message ?? "Failed to load order")
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    load()
+  }, [id])
+
+  if (!id) return <main style={{ padding: 24 }}>Loading...</main>
+  if (loading) return <main style={{ padding: 24 }}>Loading order...</main>
+  if (error) return <main style={{ padding: 24 }}>Error: {error}</main>
+  if (!order) return <main style={{ padding: 24 }}>Order not found.</main>
+
+  const items = order.order_itemsCollection?.edges?.map((e: any) => e.node) ?? []
 
   return (
     <main style={{ padding: 24 }}>
@@ -69,5 +76,5 @@ export default function OrderDetailPage({ params }: { params: { id: string } }) 
         </div>
       )}
     </main>
-  );
+  )
 }
